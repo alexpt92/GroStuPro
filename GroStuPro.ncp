@@ -1,0 +1,283 @@
+<Project>
+  <Name>GroStuPro</Name>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>Unbenannt</Name>
+    <Language>CSharp</Language>
+    <Entities>
+      <Entity type="Class">
+        <Name>XmlParser</Name>
+        <Access>Public</Access>
+        <Location left="265" top="30" />
+        <Size width="162" height="94" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">public xml input</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>JournalHandler</Name>
+        <Access>Public</Access>
+        <Location left="425" top="197" />
+        <Size width="202" height="77" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>ConferenceHandler</Name>
+        <Access>Public</Access>
+        <Location left="77" top="197" />
+        <Size width="191" height="77" />
+        <Collapsed>False</Collapsed>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>FileOutput</Name>
+        <Access>Public</Access>
+        <Location left="114" top="615" />
+        <Size width="220" height="94" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">public XML createOutputFile(String[] str)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>OutputGenerator</Name>
+        <Access>Public</Access>
+        <Location left="1172" top="303" />
+        <Size width="246" height="128" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">public Map&lt;String, String[]&gt; relationMap</Member>
+        <Member type="Method">public void createHTML()</Member>
+        <Member type="Method">public void lookupName(String input)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Comment">
+        <Text>Sorgt für den entgültigen Output und erzeugt die Links zu den entsprechenden Journals/Conferences</Text>
+        <Location left="1172" top="129" />
+        <Size width="160" height="88" />
+      </Entity>
+      <Entity type="Class">
+        <Name>RelationCreator</Name>
+        <Access>Public</Access>
+        <Location left="622" top="615" />
+        <Size width="216" height="133" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Map&lt;String, String[]&gt; relationMap</Member>
+        <Member type="Method">public void crawlDatabase()</Member>
+        <Member type="Method">public void addFile(String fileName)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Interface">
+        <Name>Handler</Name>
+        <Access>Public</Access>
+        <Location left="246" top="369" />
+        <Size width="200" height="82" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">String[] evalContent(String str)</Member>
+      </Entity>
+      <Entity type="Comment">
+        <Text>relationMap besteht aus dem Dateinamen und allen dazu verwandten Dateien, bzw. deren Dateinamen. Für jede Datei gibt es einen Eintrag.
+</Text>
+        <Location left="646" top="908" />
+        <Size width="169" height="90" />
+      </Entity>
+      <Entity type="Comment">
+        <Text>crawlDatabase():
+geht durch die Datenbank und vervollständigt die relationMap dabei. 
+Evtl rekursiv zu lösen.</Text>
+        <Location left="833" top="908" />
+        <Size width="160" height="98" />
+      </Entity>
+      <Entity type="Structure">
+        <Name>Database</Name>
+        <Access>Public</Access>
+        <Location left="1034" top="646" />
+        <Size width="207" height="111" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">public XML files</Member>
+      </Entity>
+      <Entity type="Comment">
+        <Text>Macht aus den gezählten und bewerteten Worten und dem Link zur DBLP eine neue XML Struktur mit dem Journal/Conference-Titel als Dateiname.</Text>
+        <Location left="43" top="765" />
+        <Size width="150" height="129" />
+      </Entity>
+      <Entity type="Comment">
+        <Text>Das Ergebnis von evalContent könnte wie folgt aussehen:
+output[0]=Name
+output[1]=Link zur dazugehörigen Datei in der DBLP
+output[2]-output[x]=Schlagwörter in absteigender reihenfolge mit  Anzahl oder Prozentsatz</Text>
+        <Location left="563" top="303" />
+        <Size width="363" height="98" />
+      </Entity>
+      <Entity type="Interface">
+        <Name>FileReader</Name>
+        <Access>Public</Access>
+        <Location left="1429" top="484" />
+        <Size width="162" height="83" />
+        <Collapsed>False</Collapsed>
+        <Member type="Method">file getFile(String name)</Member>
+      </Entity>
+      <Entity type="Comment">
+        <Text>addFile:
+Wenn eine neue Datei fertig ist, wird ein neuer Eintrag mit dessen Namen in die relationMap hinzugefügt.</Text>
+        <Location left="467" top="908" />
+        <Size width="160" height="98" />
+      </Entity>
+    </Entities>
+    <Relationships>
+      <Relationship type="Comment" first="5" second="4">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="0" second="2">
+        <Label>übergibt Conference</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="0" second="1">
+        <Label>übergibt Journal</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Dependency" first="1" second="7">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="2" second="7">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="2" second="3">
+        <Label>übergibt Array mit Infos</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>135</X>
+          <Y>305</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>184</X>
+          <Y>590</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="1" second="3">
+        <Label>übergibt Array mit infos</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>546</X>
+          <Y>454</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="3" second="10">
+        <Label>übergibt XML Dateien</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>215</X>
+          <Y>808</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Comment" first="11" second="3">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Comment" first="12" second="7">
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+      </Relationship>
+      <Relationship type="Dependency" first="6" second="13">
+        <Label>
+        </Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>746</X>
+          <Y>562</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1404</X>
+          <Y>565</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Dependency" first="4" second="13">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>1508</X>
+          <Y>459</Y>
+        </BendPoint>
+      </Relationship>
+      <Relationship type="Association" first="3" second="6">
+        <Label>übergibt fileName</Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Comment" first="8" second="6">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Comment" first="9" second="6">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Comment" first="14" second="6">
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+      </Relationship>
+      <Relationship type="Association" first="10" second="6">
+        <Label>Dateien anfragen</Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="False">
+          <X>863</X>
+          <Y>660</Y>
+        </BendPoint>
+        <Direction>Bidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="10" second="4">
+        <Label>Dateien anfragen</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Vertical</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>1214</X>
+          <Y>621</Y>
+        </BendPoint>
+        <Direction>Bidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+      <Relationship type="Association" first="6" second="4">
+        <Label>übergib fertige relationMap</Label>
+        <StartOrientation>Vertical</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <BendPoint relativeToStartShape="True">
+          <X>815</X>
+          <Y>589</Y>
+        </BendPoint>
+        <BendPoint relativeToStartShape="False">
+          <X>1140</X>
+          <Y>417</Y>
+        </BendPoint>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Association</AssociationType>
+      </Relationship>
+    </Relationships>
+  </ProjectItem>
+</Project>
