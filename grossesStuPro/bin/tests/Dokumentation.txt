@@ -1,0 +1,38 @@
+Großes Studienprojekt:
+
+20.04.16
+
+mögliche Kategorien zur Auswahl:
+
+	-Ähnliche Journals
+	-Conferences zu diesem Thema
+	-Authors, die sich mit dem Thema beschäftigen
+
+Zu jedem Journal und jeder Conference mit >X Einträgen ein Wörterrating, das aus den Veröffentlichungen erstellt wird. 
+
+Festzustellen:
+	
+	-wieviele Einträge, um aussagekräftig zu sein
+	-ab welcher Prozentzahl ist es "ähnlich"
+	(-wie ist die Anfrage effizient zu lösen)
+	(-welche Wörter sollen verwendet werden [mehrdeutige Wörter problematisch])
+
+
+22.04.16
+
+- nach Besprechung fällt Authors als Auswahlmöglichkeit weg
+
+
+
+25.04.16
+
+- Gemeinsames Git-Repository eingerichtet und Funktionen im Eclipse-Plugin ausprobiert
+- SaxParser in Projekt eingebunden
+
+
+
+27.04.16
+
+- Klassendiagramm des Projekts erstellt
+
+04.05.16

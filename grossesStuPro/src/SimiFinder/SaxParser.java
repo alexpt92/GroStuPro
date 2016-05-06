@@ -137,6 +137,7 @@ public class SaxParser {
 				Value = new String(ch, start, length);
 				String[] tokens = Value.split(" ");
 				for (String s : tokens) {
+					s = s.replaceAll("[^a-zA-Z]", "");  
 					s = s.toLowerCase();
 					if (m.get(s) != null) {
 						m.get(s).inc();
