@@ -46,7 +46,7 @@ public class SaxParser {
 
 	public static void main(String[] args) {
 		System.setProperty("entityExpansionLimit", "2500000");
-		/* 
+		/*
 		 * if (args.length < 1) { System.out
 		 * .println("Usage: java BooleanRetrieval1 [dblpXmlFileName]");
 		 * System.exit(0); }
@@ -60,7 +60,7 @@ public class SaxParser {
 
 	class ConfigHandler extends DefaultHandler {
 		// private String key = null;
-		private Map<String, Counter> m = new HashMap<String , Counter>();
+		private Map<String, Counter> m = new HashMap<String, Counter>();
 		private boolean insideInterestingField = false, getIt = false;
 		private String Value = "";
 
@@ -70,16 +70,18 @@ public class SaxParser {
 		public void startElement(String namespaceURI, String localName,
 				String rawName, Attributes atts) throws SAXException {
 
-			if (atts.getLength() > 0) {
+			if (atts.getValue("key") != null) {
 
 				String str = atts.getValue("key");
 				if (str.startsWith("journals/") || str.startsWith("conf/")) {
 					getIt = true;
+
 				}
 			}
 
 			if (rawName.equals("title") && getIt) {
 				insideInterestingField = true;
+
 			}
 
 		}
@@ -95,19 +97,31 @@ public class SaxParser {
 
 		@Override
 		public void endDocument() {
+			Map<String, Integer> resultMap = new HashMap<String, Integer>();
 			System.out.println("Document ends.");
 			if (m != null) {
 				try {
-					PrintStream ps = new PrintStream(new File("wordCount.txt"));
 					for (Entry<String, Counter> entry : m.entrySet()) {
-						ps.println(entry.getKey() + " "
-								+ entry.getValue().getVal());
+						if (entry.getValue().getVal() > 1) {
+							resultMap.put(entry.getKey(), entry.getValue()
+									.getVal());
+						}
+					}
+					System.out.println("Start sorting");
+					resultMap = OrderOutput.sortMapByValues(resultMap);
+					System.out.println("Done sorting");
+					PrintStream ps = new PrintStream(new File("wordCount.txt"));
+					for (Entry<String, Integer> entry : resultMap.entrySet()) {
+
+						ps.println(entry.getValue() + " "
+								+ entry.getKey());
+
 					}
 					System.out.println("File printed.");
 					ps.close();
 					m.clear();
+					resultMap.clear();
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} else {
@@ -116,8 +130,6 @@ public class SaxParser {
 			}
 		}
 
-		
-		
 		@Override
 		public void characters(char[] ch, int start, int length)
 				throws SAXException {
@@ -125,9 +137,11 @@ public class SaxParser {
 				Value = new String(ch, start, length);
 				String[] tokens = Value.split(" ");
 				for (String s : tokens) {
-					if (m.get(s) != null){
+					s = s.toLowerCase();
+					if (m.get(s) != null) {
 						m.get(s).inc();
 					} else {
+
 						Counter counter = new Counter();
 						m.put(s, counter);
 

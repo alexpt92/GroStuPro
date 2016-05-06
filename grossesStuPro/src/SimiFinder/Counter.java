@@ -3,7 +3,7 @@ package SimiFinder;
 public class Counter {
 	int val;
 	Counter(){
-		val = 0;
+		val = 1;
 	}
 	public void inc(){
 		val++;
