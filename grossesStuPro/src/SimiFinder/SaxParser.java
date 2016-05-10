@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,8 +24,12 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class SaxParser {
 
+	private long time;
+
+
 	public SaxParser(String dblpXmlFileName) {
 		try {
+			time = System.currentTimeMillis();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser saxParser = factory.newSAXParser();
 
@@ -55,11 +60,15 @@ public class SaxParser {
 		Scanner input = new Scanner(System.in);
 		String s = input.next();
 		input.close();
+
 		new SaxParser(s);
 	}
 
 	class ConfigHandler extends DefaultHandler {
-		// private String key = null;
+		// Warum muss initialisiert werden`und nicht einfach ohne instanz:
+		// "new StopWords()"
+		StopWords stop = new StopWords();
+		ArrayList<String> stops = new ArrayList<String>();
 		private Map<String, Counter> m = new HashMap<String, Counter>();
 		private boolean insideInterestingField = false, getIt = false;
 		private String Value = "";
@@ -113,13 +122,15 @@ public class SaxParser {
 					PrintStream ps = new PrintStream(new File("wordCount.txt"));
 					for (Entry<String, Integer> entry : resultMap.entrySet()) {
 
-						ps.println(entry.getValue() + " "
-								+ entry.getKey());
+						ps.println(entry.getValue() + " " + entry.getKey());
 
 					}
 					System.out.println("File printed.");
+
 					ps.close();
 					m.clear();
+					System.out.println("Runtime: "
+							+ (System.currentTimeMillis() - time) / 1000);
 					resultMap.clear();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -127,7 +138,17 @@ public class SaxParser {
 			} else {
 				System.out.println("Map is empty");
 
+			}//Datei mit den gefundenen Stopwörten aus StopWordsList.txt wird ausgegeben
+			/*try {
+				PrintStream ps = new PrintStream(new File("actualStops.txt"));
+				for (String s : stops) {
+					ps.println(s);
+				}
+				ps.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
 			}
+			System.out.println("actualStops printed.");*/
 		}
 
 		@Override
@@ -137,17 +158,21 @@ public class SaxParser {
 				Value = new String(ch, start, length);
 				String[] tokens = Value.split(" ");
 				for (String s : tokens) {
-					s = s.replaceAll("[^a-zA-Z]", "");  
+					s = s.replaceAll("[^a-zA-Z]", "");
 					s = s.toLowerCase();
-					if (m.get(s) != null) {
-						m.get(s).inc();
-					} else {
+					if (!StopWords.isStopWord(s)) {
+						if (m.get(s) != null) {
+							m.get(s).inc();
+						} else {
 
-						Counter counter = new Counter();
-						m.put(s, counter);
+							Counter counter = new Counter();
+							m.put(s, counter);
 
-					}
-
+						}
+						//benutzen, um die Stopwortliste mit den tatsächlichen Stopwörtern zu vergleichen
+					}/* else if(!stops.contains(s)) {
+						stops.add(s);
+					}*/
 				}
 				getIt = false;
 				insideInterestingField = false;
@@ -179,5 +204,4 @@ public class SaxParser {
 		}
 
 	}
-
 }

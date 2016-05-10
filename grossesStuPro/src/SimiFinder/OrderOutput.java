@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class OrderOutput {
-	public static <String, Integer extends Comparable<? super Integer>> Map<String, Integer> 
+	public static <K, V extends Comparable<? super Integer>> Map<String, Integer> 
 	sortMapByValues( Map<String, Integer> map )
 {
     Map<String, Integer> result = new LinkedHashMap<>();
