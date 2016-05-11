@@ -12,7 +12,7 @@ public class StopWords {
 			BufferedReader br = new BufferedReader(new FileReader("StopWordsList.txt"));
 			
 			while ((line = br.readLine()) != null){
-				words.add(line);
+				if (!line.equals(" "))words.add(line);
 			}
 			br.close();
 		}catch(Exception e){

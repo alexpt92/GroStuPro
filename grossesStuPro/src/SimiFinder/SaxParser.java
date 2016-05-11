@@ -25,7 +25,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class SaxParser {
 
 	private long time;
-
+	private boolean checkStopWords = false;
 
 	public SaxParser(String dblpXmlFileName) {
 		try {
@@ -56,11 +56,13 @@ public class SaxParser {
 		 * .println("Usage: java BooleanRetrieval1 [dblpXmlFileName]");
 		 * System.exit(0); }
 		 */
+		/*
 		System.out.println("Dateipfad der dblp eingeben: ");
 		Scanner input = new Scanner(System.in);
 		String s = input.next();
-		input.close();
-
+		input.close(); 
+		*/
+		String s = "C:\\Users\\Admin\\Desktop\\Uni\\GrStuPro\\dblp.xml";
 		new SaxParser(s);
 	}
 
@@ -137,18 +139,23 @@ public class SaxParser {
 				}
 			} else {
 				System.out.println("Map is empty");
-
-			}//Datei mit den gefundenen Stopwörten aus StopWordsList.txt wird ausgegeben
-			/*try {
-				PrintStream ps = new PrintStream(new File("actualStops.txt"));
-				for (String s : stops) {
-					ps.println(s);
-				}
-				ps.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+			 
 			}
-			System.out.println("actualStops printed.");*/
+			// Datei mit den gefundenen Stopwörten aus StopWordsList.txt wird
+				// ausgegeben
+			if (checkStopWords) {
+				try {
+					PrintStream ps = new PrintStream(
+							new File("actualStops.txt"));
+					for (String s : stops) {
+						ps.println(s);
+					}
+					ps.close();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				System.out.println("actualStops printed.");
+			}
 		}
 
 		@Override
@@ -169,10 +176,14 @@ public class SaxParser {
 							m.put(s, counter);
 
 						}
-						//benutzen, um die Stopwortliste mit den tatsächlichen Stopwörtern zu vergleichen
-					}/* else if(!stops.contains(s)) {
-						stops.add(s);
-					}*/
+						// benutzen, um die Stopwortliste mit den tatsächlichen
+						// Stopwörtern zu vergleichen
+					}
+					if (checkStopWords && StopWords.isStopWord(s)) {
+						if (!stops.contains(s)) {
+							stops.add(s);
+						}
+					}
 				}
 				getIt = false;
 				insideInterestingField = false;
