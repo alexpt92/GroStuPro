@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Scanner;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -108,41 +106,15 @@ public class SaxParser {
 
 		@Override
 		public void endDocument() {
-			Map<String, Integer> resultMap = new HashMap<String, Integer>();
 			System.out.println("Document ends.");
 			if (m != null) {
-				try {
-					for (Entry<String, Counter> entry : m.entrySet()) {
-						if (entry.getValue().getVal() > 1) {
-							resultMap.put(entry.getKey(), entry.getValue()
-									.getVal());
-						}
-					}
-					System.out.println("Start sorting");
-					resultMap = OrderOutput.sortMapByValues(resultMap);
-					System.out.println("Done sorting");
-					PrintStream ps = new PrintStream(new File("wordCount.txt"));
-					for (Entry<String, Integer> entry : resultMap.entrySet()) {
-
-						ps.println(entry.getValue() + " " + entry.getKey());
-
-					}
-					System.out.println("File printed.");
-
-					ps.close();
-					m.clear();
-					System.out.println("Runtime: "
-							+ (System.currentTimeMillis() - time) / 1000);
-					resultMap.clear();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
+				//PrintWordList.printCountedList(m);
 			} else {
 				System.out.println("Map is empty");
 			 
 			}
 			// Datei mit den gefundenen Stopwörten aus StopWordsList.txt wird
-				// ausgegeben
+			// ausgegeben
 			if (checkStopWords) {
 				try {
 					PrintStream ps = new PrintStream(
@@ -156,6 +128,7 @@ public class SaxParser {
 				}
 				System.out.println("actualStops printed.");
 			}
+			System.out.println("Laufzeit" + " " + (System.currentTimeMillis() - time)/1000);
 		}
 
 		@Override
@@ -176,14 +149,16 @@ public class SaxParser {
 							m.put(s, counter);
 
 						}
-						// benutzen, um die Stopwortliste mit den tatsächlichen
-						// Stopwörtern zu vergleichen
+						
 					}
-					if (checkStopWords && StopWords.isStopWord(s)) {
+					// benutzen, um die Stopwortliste mit den tatsächlichen
+					// Stopwörtern zu vergleichen
+					/*if (checkStopWords && StopWords.isStopWord(s)) {
 						if (!stops.contains(s)) {
 							stops.add(s);
 						}
 					}
+					*/
 				}
 				getIt = false;
 				insideInterestingField = false;

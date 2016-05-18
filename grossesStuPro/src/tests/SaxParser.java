@@ -67,9 +67,9 @@ public class SaxParser {
 			if (level == 2) {
 				if (atts.getLength() > 0) {
 					String s = atts.getValue("key");
-					key = null;
+					setKey(null);
 					if (s != null && !s.startsWith("homepages/")) {
-						key = s;
+						setKey(s);
 						documentCount++;
 						if (documentCount % 100000 == 0)
 							System.err.println(documentCount + " documents");
@@ -129,6 +129,14 @@ public class SaxParser {
 
 			Message("**Parsing Fatal Error**\n", exception);
 			throw new SAXException("Fatal Error encountered");
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
 		}
 
 	}
