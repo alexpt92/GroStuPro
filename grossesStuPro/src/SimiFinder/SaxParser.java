@@ -53,11 +53,9 @@ public class SaxParser {
 		 * System.exit(0); }
 		 */
 		/*
-		System.out.println("Dateipfad der dblp eingeben: ");
-		Scanner input = new Scanner(System.in);
-		String s = input.next();
-		input.close(); 
-		*/
+		 * System.out.println("Dateipfad der dblp eingeben: "); Scanner input =
+		 * new Scanner(System.in); String s = input.next(); input.close();
+		 */
 		String s = "C:\\Users\\Admin\\Desktop\\Uni\\GrStuPro\\dblp.xml";
 		new SaxParser(s);
 	}
@@ -65,11 +63,14 @@ public class SaxParser {
 	class ConfigHandler extends DefaultHandler {
 		// Warum muss initialisiert werden`und nicht einfach ohne instanz:
 		// "new StopWords()"
+		private Map<String, Term> globalMap = new HashMap<String, Term>();
+		private Map<String, Map<String, LinkedTerm>> localMap = new HashMap<String, Map<String, LinkedTerm>>();
 		StopWords stop = new StopWords();
 		ArrayList<String> stops = new ArrayList<String>();
 		private Map<String, Counter> m = new HashMap<String, Counter>();
 		private boolean insideInterestingField = false, getIt = false;
-		private String Value = "";
+		private String Value = "", streamName = "";
+		private MapManager maps = new MapManager(globalMap, localMap);
 
 		public void setDocumentLocator(Locator locator) {
 		}
@@ -82,7 +83,8 @@ public class SaxParser {
 				String str = atts.getValue("key");
 				if (str.startsWith("journals/") || str.startsWith("conf/")) {
 					getIt = true;
-
+					String[] tmp = str.split("/");
+					streamName = tmp[1];
 				}
 			}
 
@@ -106,13 +108,13 @@ public class SaxParser {
 		public void endDocument() {
 			System.out.println("Document ends.");
 			if (m != null) {
-				//PrintWordList.printCountedList(m);
+				// PrintWordList.printCountedList(m);
 			} else {
 				System.out.println("Map is empty");
-			 
+
 			}
 			// Datei mit den gefundenen Stopwörten aus StopWordsList.txt wird
-			// ausgegeben
+			// ausgegeben, wenn checkStopWords = true (kann oben getoggelt werden)
 			if (checkStopWords) {
 				try {
 					PrintStream ps = new PrintStream(
@@ -126,7 +128,8 @@ public class SaxParser {
 				}
 				System.out.println("actualStops printed.");
 			}
-			System.out.println("Laufzeit" + " " + (System.currentTimeMillis() - time)/1000);
+			System.out.println("Laufzeit" + " "
+					+ (System.currentTimeMillis() - time) / 1000);
 		}
 
 		@Override
@@ -138,29 +141,28 @@ public class SaxParser {
 				for (String s : tokens) {
 					s = s.replaceAll("[^a-zA-Z]", "");
 					s = s.toLowerCase();
-					if (!StopWords.isStopWord(s)) {
-						if (m.get(s) != null) {
-							m.get(s).inc();
-						} else {
 
-							Counter counter = new Counter();
-							m.put(s, counter);
+					maps.addTerm(s, streamName);
 
-						}
-						
-					}
-					// benutzen, um die Stopwortliste mit den tatsächlichen
-					// Stopwörtern zu vergleichen
-					/*if (checkStopWords && StopWords.isStopWord(s)) {
-						if (!stops.contains(s)) {
-							stops.add(s);
-						}
-					}
-					*/
+					/*
+					 * if (!StopWords.isStopWord(s)) {
+					 * 
+					 * if (m.get(s) != null) { m.get(s).inc(); } else {
+					 * 
+					 * Counter counter = new Counter(); m.put(s, counter);
+					 * 
+					 * }
+					 */
 				}
-				getIt = false;
-				insideInterestingField = false;
+				// benutzen, um die Stopwortliste mit den tatsächlichen
+				// Stopwörtern zu vergleichen
+				/*
+				 * if (checkStopWords && StopWords.isStopWord(s)) { if
+				 * (!stops.contains(s)) { stops.add(s); } }
+				 */
 			}
+			getIt = false;
+			insideInterestingField = false;
 		}
 
 		private void Message(String mode, SAXParseException exception) {

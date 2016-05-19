@@ -3,3 +3,10 @@ Algorithmus, der die Terme evaluiert einbinden.
 
 Verschachtelte Datenstruktur der Autoren und Co-Autoren erstellt
 Autoren als neuer Eintrag in Journal und Conference Map
+	Bei Autoren zu beachten: 
+		keine Kommata im author Element
+		Initialien: H. P. Baxter, also immer mit Punkten und Leerzeichen
+		Name wird nur "normal" geschrieben : "Hans Wurst", nicht "Wurst, Hans"
+		Namen sind durch "and" getrennt
+		Reihenfolge ist wichtig
+		

@@ -4,11 +4,15 @@ import java.util.*;
 
 public class MapManager {
 	//globalTerms sind alle Terms zusammen in einer Map. Der Key ist dabei der Term
-	private static Map<String, Term> globalMap = new HashMap<String, Term>();
+	private Map<String, Term> globalMap/* = new HashMap<String, Term>()*/;
 	
 	//localTerms sind alle Terms pro Stream(Journal oder Conference). Der Key ist dabei der Journal/ConferenceName. Die zweite Map enthält den Term als Schlüssel.
-	private static Map<String, Map<String, LinkedTerm>> localMap = new HashMap<String, Map<String, LinkedTerm>>();
+	private Map<String, Map<String, LinkedTerm>> localMap/* = new HashMap<String, Map<String, LinkedTerm>>()*/;
 	
+	MapManager(Map<String, Term> inputGlobal, Map<String, Map<String, LinkedTerm>> inputLocal){
+		this.globalMap = inputGlobal;
+		this.localMap = inputLocal;
+	}
 	/* Struktur localMap: 
 	 * 	(Schlüssel(Journal/ConferenceName)	,(Schlüssel(TermName),(Term(lokaler Term),Term(globaler Term)))
 	 * 										,(Schlüssel(TermName),(Term(lokaler Term),Term(globaler Term)))
@@ -16,22 +20,30 @@ public class MapManager {
 	 * 										,...)
 	 * */
 	
-	static void addTerm(String str, String stream){
+	void addTerm(String str, String stream){
 		if (!StopWords.isStopWord(str)){
 			if(!globalMap.containsKey(str)){
-				createAllNewEntry(str, stream);						
+				//Methode 1
+				createAllNewEntry(str, stream);	
+				System.out.println(stream);
 			}
 			else{
 				globalMap.get(str).counter.inc();
 				if(!localMap.containsKey(stream)){
+					//Methode 2
 					createNewLocalEntry(str, stream);
+					System.out.println(stream);
 				}
 				else{
 					if(!localMap.get(stream).containsKey(str)){
+						//Methode 3
 						createNewTermEntry(str, stream);
+						System.out.println(stream);
 					}
 					else{
+						//Term ist global und lokal vorgekommen und der counter wird inc()
 						localMap.get(stream).get(str).localTerm.counter.inc();
+						System.out.println(stream);
 					}
 				}
 			}
@@ -39,8 +51,8 @@ public class MapManager {
 	}
 	//die kommenden Methoden kann man sicher noch zusammenfassen, ich fand es vorerst einfacher für den Überblick
 	
-	//Wenn der Term noch nie vorgekommen und kein StopWort ist wir diese Methode ausgeführt
-	static  void createAllNewEntry (String str, String stream){		
+	//Methode 1: Wenn der Term noch nie vorgekommen und kein StopWort ist wir diese Methode ausgeführt
+	void createAllNewEntry (String str, String stream){		
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 		Term glblTerm = new Term(str);
 
@@ -54,8 +66,8 @@ public class MapManager {
 		
 		tmpMap.clear();
 	}
-	//Wenn der Term global schon vorgekommen ist, aber der Stream noch nicht
-	static void createNewLocalEntry(String str, String stream){
+	//Methode 2: Wenn der Term global schon vorgekommen ist, aber der Stream noch nicht
+	void createNewLocalEntry(String str, String stream){
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 
 		LinkedTerm tmpLTerm = new LinkedTerm();
@@ -67,8 +79,8 @@ public class MapManager {
 		
 		tmpMap.clear();
 	}
-	//Wenn der Term global schon vorgekommen ist und der Stream bereits existiert, der Term aber noch nicht im Stream eingetragen
-	static void createNewTermEntry(String str, String stream){
+	//Methode 3: Wenn der Term global schon vorgekommen ist und der Stream bereits existiert, der Term aber noch nicht im Stream eingetragen
+	void createNewTermEntry(String str, String stream){
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 		
 		LinkedTerm tmpLTerm = new LinkedTerm();
