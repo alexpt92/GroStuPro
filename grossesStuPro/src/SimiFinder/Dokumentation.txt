@@ -1,0 +1,61 @@
+Großes Studienprojekt:
+
+20.04.16
+
+mögliche Kategorien zur Auswahl:
+
+	-Ähnliche Journals
+	-Conferences zu diesem Thema
+	-Authors, die sich mit dem Thema beschäftigen
+
+Zu jedem Journal und jeder Conference mit >X Einträgen ein Wörterrating, das aus den Veröffentlichungen erstellt wird. 
+
+Festzustellen:
+	
+	-wieviele Einträge, um aussagekräftig zu sein
+	-ab welcher Prozentzahl ist es "ähnlich"
+	(-wie ist die Anfrage effizient zu lösen)
+	(-welche Wörter sollen verwendet werden [mehrdeutige Wörter problematisch])
+
+
+22.04.16
+
+	- nach Besprechung fällt Authors als Auswahlmöglichkeit weg
+
+
+
+25.04.16
+
+	- Gemeinsames Git-Repository eingerichtet und Funktionen im Eclipse-Plugin ausprobiert
+	- SaxParser in Projekt eingebunden
+
+
+27.04.16
+
+	- Klassendiagramm des Projekts erstellt
+
+04.05.16
+
+	- SaxParser findet alle Journals und Conferences und filtert die Terme raus
+
+06.05.16
+
+	- SaxParser normiert alle Wörter und filtert Stopwörter
+	- Terme werden nach Vorkommen sortier und in Datei ausgegeben
+
+10.05.16
+
+	- Programmlaufzeit verbessert
+	- Liste der Stopwörter erheblich erweitert
+
+15.05.16
+
+	- Programm neu organisiert und mehr Delegation  (u.A. Fileoutput ausgelagert und MapManager eingeführt, der sich um die Terme kümmert)
+	- Methoden kommentiert und Datenstrukturen (Aufbau der Maps) beschrieben
+	- Termlisten von Journals und Conferences erstellt
+	- Termlisten von Journals und Conferences stehen nun in Verbindung zu den passenden globalen Termen
+
+19.05.16
+
+	- Verschachtelte Datenstruktur der Autoren und Co-Autoren erstellt
+	- Autoren als neuer Eintrag in Journal und Conference Map

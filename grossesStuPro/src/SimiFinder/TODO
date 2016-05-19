@@ -1,4 +1,5 @@
-Map für Autoren und CoAutoren
-
 MapManager in Parser einbinden
 Algorithmus, der die Terme evaluiert einbinden.
+
+Verschachtelte Datenstruktur der Autoren und Co-Autoren erstellt
+Autoren als neuer Eintrag in Journal und Conference Map
