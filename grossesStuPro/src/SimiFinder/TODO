@@ -2,7 +2,8 @@ MapManager in Parser einbinden
 Algorithmus, der die Terme evaluiert einbinden.
 
 Verschachtelte Datenstruktur der Autoren und Co-Autoren erstellt
-Autoren als neuer Eintrag in Journal und Conference Map
+Autoren als neuer Eintrag in Journal und Conference Map oder Neue Maps für Autoren, wie bei Journal und Conference (mit Global und Lokal)
+	
 	Bei Autoren zu beachten: 
 		keine Kommata im author Element
 		Initialien: H. P. Baxter, also immer mit Punkten und Leerzeichen
