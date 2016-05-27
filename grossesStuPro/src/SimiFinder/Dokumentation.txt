@@ -57,5 +57,5 @@ Festzustellen:
 
 19.05.16
 
-	- Verschachtelte Datenstruktur der Autoren und Co-Autoren erstellt
+	- Datenstruktur der Autoren und Co-Autoren erstellt
 	- Autoren als neuer Eintrag in Journal und Conference Map

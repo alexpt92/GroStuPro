@@ -65,12 +65,13 @@ public class SaxParser {
 		// "new StopWords()"
 		private Map<String, Term> globalMap = new HashMap<String, Term>();
 		private Map<String, Map<String, LinkedTerm>> localMap = new HashMap<String, Map<String, LinkedTerm>>();
+		private Map<String, Author>authors = new HashMap<String, Author>();
 		StopWords stop = new StopWords();
 		ArrayList<String> stops = new ArrayList<String>();
 		private Map<String, Counter> m = new HashMap<String, Counter>();
 		private boolean insideInterestingField = false, getIt = false;
 		private String Value = "", streamName = "";
-		private MapManager maps = new MapManager(globalMap, localMap);
+		private MapManager maps = new MapManager(globalMap, localMap, authors);
 
 		public void setDocumentLocator(Locator locator) {
 		}
