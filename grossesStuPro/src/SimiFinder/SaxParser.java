@@ -149,7 +149,7 @@ public class SaxParser {
 				
 				
 				if (insideAuthorField){	
-					String[] author = new String(ch, start, length);
+					String author = new String(ch, start, length);
 					maps.addAuthor(author, streamName);}
 				
 					/*
