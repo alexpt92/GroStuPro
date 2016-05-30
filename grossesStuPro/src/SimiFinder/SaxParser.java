@@ -110,7 +110,16 @@ public class SaxParser {
 
 		@Override
 		public void endDocument() {
+
+		    for(String key : authors.keySet()) //AutorMapTest
+		    {
+		      System.out.print("Key: " + key + " - ");
+		      System.out.print("Value: " + authors.get(key) + "\n");
+		    }
+			
 			System.out.println("Document ends.");
+
+		    
 			if (m != null) {
 				// PrintWordList.printCountedList(m);
 			} else {
@@ -145,13 +154,12 @@ public class SaxParser {
 				for (String s : tokens) {
 					s = s.replaceAll("[^a-zA-Z]", "");
 					s = s.toLowerCase();
-					maps.addTerm(s, streamName);}
+					maps.addTerm(s, streamName);}}
 				
 				
 				if (insideAuthorField){	
-					String author = new String(ch, start, length);
-					maps.addAuthor(author, streamName);}
-				
+					String Value = new String(ch, start, length);
+					maps.addAuthor(Value, streamName);}//}
 					/*
 					 * if (!StopWords.isStopWord(s)) {
 					 * 
@@ -168,7 +176,7 @@ public class SaxParser {
 				 * if (checkStopWords && StopWords.isStopWord(s)) { if
 				 * (!stops.contains(s)) { stops.add(s); } }
 				 */
-			}
+			
 			getIt = false;
 			insideInterestingField = false;
 			insideAuthorField = false;

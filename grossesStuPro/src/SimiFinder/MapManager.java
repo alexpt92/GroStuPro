@@ -8,8 +8,8 @@ public class MapManager {
 	private Map<String, Term> globalMap/* = new HashMap<String, Term>() */;
 
 	// localTerms sind alle Terms pro Stream(Journal oder Conference). Der Key
-	// ist dabei der Journal/ConferenceName. Die zweite Map enthält den Term als
-	// Schlüssel.
+	// ist dabei der Journal/ConferenceName. Die zweite Map enthï¿½lt den Term als
+	// Schlï¿½ssel.
 	private Map<String, Map<String, LinkedTerm>> localMap/*
 														 * = new HashMap<String,
 														 * Map<String,
@@ -27,10 +27,10 @@ public class MapManager {
 	}
 
 	/*
-	 * Struktur localMap: (Schlüssel(Journal/ConferenceName)
-	 * ,(Schlüssel(TermName),(Term(lokaler Term),Term(globaler Term)))
-	 * ,(Schlüssel(TermName),(Term(lokaler Term),Term(globaler Term)))
-	 * ,(Schlüssel(TermName),(Term(lokaler Term),Term(globaler Term))) ,...)
+	 * Struktur localMap: (Schlï¿½ssel(Journal/ConferenceName)
+	 * ,(Schlï¿½ssel(TermName),(Term(lokaler Term),Term(globaler Term)))
+	 * ,(Schlï¿½ssel(TermName),(Term(lokaler Term),Term(globaler Term)))
+	 * ,(Schlï¿½ssel(TermName),(Term(lokaler Term),Term(globaler Term))) ,...)
 	 */
 
 	void addAuthor(String str, String stream) {
@@ -78,10 +78,10 @@ public class MapManager {
 	}
 
 	// die kommenden Methoden kann man sicher noch zusammenfassen, ich fand es
-	// vorerst einfacher für den Überblick
+	// vorerst einfacher fï¿½r den ï¿½berblick
 
 	// Methode 1: Wenn der Term noch nie vorgekommen und kein StopWort ist wir
-	// diese Methode ausgeführt
+	// diese Methode ausgefï¿½hrt
 	void createAllNewEntry(String str, String stream) {
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 		Term glblTerm = new Term(str);
@@ -128,12 +128,14 @@ public class MapManager {
 
 	}
 
+
+
 }
 
-// Author enthält 2 Listen: -In streams gibt es für jedes Journal/Conference
+// Author enthï¿½lt 2 Listen: -In streams gibt es fï¿½r jedes Journal/Conference
 // einen Eintrag und die Anzahl an Artikeln in diesem Stream, an denen der
 // Author beteiligt war.
-// -coAuthors entählt alle Coauthoren des Authors, als rekursiv verschachtelte
+// -coAuthors entï¿½hlt alle Coauthoren des Authors, als rekursiv verschachtelte
 // Struktur.
 class Author {
 	Map<String, Counter> streams = new HashMap<String, Counter>();
