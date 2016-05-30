@@ -69,7 +69,7 @@ public class SaxParser {
 		StopWords stop = new StopWords();
 		ArrayList<String> stops = new ArrayList<String>();
 		private Map<String, Counter> m = new HashMap<String, Counter>();
-		private boolean insideInterestingField = false, getIt = false;
+		private boolean insideInterestingField = false, insideAuthorField = false, getIt = false;
 		private String Value = "", streamName = "";
 		private MapManager maps = new MapManager(globalMap, localMap, authors);
 
@@ -93,6 +93,9 @@ public class SaxParser {
 				insideInterestingField = true;
 
 			}
+			if (rawName.equals("author") && getIt) {
+				insideAuthorField = true;
+			}
 
 		}
 
@@ -114,7 +117,7 @@ public class SaxParser {
 				System.out.println("Map is empty");
 
 			}
-			// Datei mit den gefundenen Stopwörten aus StopWordsList.txt wird
+			// Datei mit den gefundenen Stopwï¿½rten aus StopWordsList.txt wird
 			// ausgegeben, wenn checkStopWords = true (kann oben getoggelt werden)
 			if (checkStopWords) {
 				try {
@@ -142,9 +145,13 @@ public class SaxParser {
 				for (String s : tokens) {
 					s = s.replaceAll("[^a-zA-Z]", "");
 					s = s.toLowerCase();
-
-					maps.addTerm(s, streamName);
-
+					maps.addTerm(s, streamName);}
+				
+				
+				if (insideAuthorField){	
+					String author = new String(ch, start, length);
+					maps.addAuthor(author, streamName);}
+				
 					/*
 					 * if (!StopWords.isStopWord(s)) {
 					 * 
@@ -154,9 +161,9 @@ public class SaxParser {
 					 * 
 					 * }
 					 */
-				}
-				// benutzen, um die Stopwortliste mit den tatsächlichen
-				// Stopwörtern zu vergleichen
+				
+				// benutzen, um die Stopwortliste mit den tatsï¿½chlichen
+				// Stopwï¿½rtern zu vergleichen
 				/*
 				 * if (checkStopWords && StopWords.isStopWord(s)) { if
 				 * (!stops.contains(s)) { stops.add(s); } }
@@ -164,6 +171,7 @@ public class SaxParser {
 			}
 			getIt = false;
 			insideInterestingField = false;
+			insideAuthorField = false;
 		}
 
 		private void Message(String mode, SAXParseException exception) {
