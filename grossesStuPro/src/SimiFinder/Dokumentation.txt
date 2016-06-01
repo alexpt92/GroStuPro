@@ -59,3 +59,15 @@ Festzustellen:
 
 	- Datenstruktur der Autoren und Co-Autoren erstellt
 	- Autoren als neuer Eintrag in Journal und Conference Map
+	
+24.05.16
+
+	-Autoren jetzt eigenstädig verwaltet
+	
+30.05.16
+
+	-Autoren/Coautorenliste ist korrekt
+	
+01.05.16
+
+	-Listen bereinigt und gefiltert
