@@ -65,11 +65,12 @@ public class SaxParser {
 		// "new StopWords()"
 		private Map<String, Term> globalMap = new HashMap<String, Term>();
 		private Map<String, Map<String, LinkedTerm>> localMap = new HashMap<String, Map<String, LinkedTerm>>();
-		private Map<String, Author>authors = new HashMap<String, Author>();
+		private Map<String, Author> authors = new HashMap<String, Author>();
 		StopWords stop = new StopWords();
 		ArrayList<String> stops = new ArrayList<String>();
 		private Map<String, Counter> m = new HashMap<String, Counter>();
-		private boolean insideInterestingField = false, insideAuthorField = false, getIt = false;
+		private boolean insideInterestingField = false,
+				insideAuthorField = false, getIt = false;
 		private String Value = "", streamName = "";
 		private MapManager maps = new MapManager(globalMap, localMap, authors);
 
@@ -111,15 +112,16 @@ public class SaxParser {
 		@Override
 		public void endDocument() {
 
-		    for(String key : authors.keySet()) //AutorMapTest
-		    {
-		      System.out.print("Key: " + key + " - ");
-		      System.out.print("Value: " + authors.get(key) + "\n");
-		    }
+			/*for (String key : authors.keySet()) // AutorMapTest
+			{
+				System.out.print("Key: " + key + " - ");
+				System.out.print("Value: " + authors.get(key) + "\n");
+			}
+			*/
 			
+			maps.filterMap(localMap, globalMap);
 			System.out.println("Document ends.");
 
-		    
 			if (m != null) {
 				// PrintWordList.printCountedList(m);
 			} else {
@@ -127,7 +129,8 @@ public class SaxParser {
 
 			}
 			// Datei mit den gefundenen Stopw�rten aus StopWordsList.txt wird
-			// ausgegeben, wenn checkStopWords = true (kann oben getoggelt werden)
+			// ausgegeben, wenn checkStopWords = true (kann oben getoggelt
+			// werden)
 			if (checkStopWords) {
 				try {
 					PrintStream ps = new PrintStream(
@@ -143,6 +146,9 @@ public class SaxParser {
 			}
 			System.out.println("Laufzeit" + " "
 					+ (System.currentTimeMillis() - time) / 1000);
+			globalMap.clear();
+			localMap.clear();
+			authors.clear();
 		}
 
 		@Override
@@ -154,29 +160,31 @@ public class SaxParser {
 				for (String s : tokens) {
 					s = s.replaceAll("[^a-zA-Z]", "");
 					s = s.toLowerCase();
-					maps.addTerm(s, streamName);}}
-				
-				
-				if (insideAuthorField){	
-					String Value = new String(ch, start, length);
-					maps.addAuthor(Value, streamName);}//}
-					/*
-					 * if (!StopWords.isStopWord(s)) {
-					 * 
-					 * if (m.get(s) != null) { m.get(s).inc(); } else {
-					 * 
-					 * Counter counter = new Counter(); m.put(s, counter);
-					 * 
-					 * }
-					 */
-				
-				// benutzen, um die Stopwortliste mit den tats�chlichen
-				// Stopw�rtern zu vergleichen
-				/*
-				 * if (checkStopWords && StopWords.isStopWord(s)) { if
-				 * (!stops.contains(s)) { stops.add(s); } }
-				 */
-			
+					maps.addTerm(s, streamName);
+				}
+			}
+
+			if (insideAuthorField) {
+				String Value = new String(ch, start, length);
+				maps.addAuthor(Value, streamName);
+			}
+			/*
+			 * if (!StopWords.isStopWord(s)) {
+			 * 
+			 * if (m.get(s) != null) { m.get(s).inc(); } else {
+			 * 
+			 * Counter counter = new Counter(); m.put(s, counter);
+			 * 
+			 * }
+			 */
+
+			// benutzen, um die Stopwortliste mit den tats�chlichen
+			// Stopw�rtern zu vergleichen
+			/*
+			 * if (checkStopWords && StopWords.isStopWord(s)) { if
+			 * (!stops.contains(s)) { stops.add(s); } }
+			 */
+
 			getIt = false;
 			insideInterestingField = false;
 			insideAuthorField = false;

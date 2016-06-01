@@ -1,6 +1,7 @@
 package SimiFinder;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 public class MapManager {
 	// globalTerms sind alle Terms zusammen in einer Map. Der Key ist dabei der
@@ -8,7 +9,8 @@ public class MapManager {
 	private Map<String, Term> globalMap/* = new HashMap<String, Term>() */;
 
 	// localTerms sind alle Terms pro Stream(Journal oder Conference). Der Key
-	// ist dabei der Journal/ConferenceName. Die zweite Map enthï¿½lt den Term als
+	// ist dabei der Journal/ConferenceName. Die zweite Map enthï¿½lt den Term
+	// als
 	// Schlï¿½ssel.
 	private Map<String, Map<String, LinkedTerm>> localMap/*
 														 * = new HashMap<String,
@@ -37,12 +39,10 @@ public class MapManager {
 		if (!authors.containsKey(str)) {
 			authors.put(str, new Author(str));
 			authors.get(str).addStream(stream);
-		} 
-		else {
+		} else {
 			if (authors.get(str).streams.containsKey(stream)) {
 				authors.get(str).streams.get(stream).inc();
-			} 
-			else {
+			} else {
 				authors.get(str).addStream(stream);
 			}
 		}
@@ -54,7 +54,6 @@ public class MapManager {
 			if (!globalMap.containsKey(str)) {
 				// Methode 1
 				createAllNewEntry(str, stream);
-				System.out.println(stream);
 			} else {
 				globalMap.get(str).counter.inc();
 				if (!localMap.containsKey(stream)) {
@@ -75,6 +74,24 @@ public class MapManager {
 				}
 			}
 		}
+	}
+	//schmeißt alle überflüssigen Terme, also die, mit vorkommen 1 aus localMap und globalMap
+	void filterMap(Map<String, Map<String, LinkedTerm>> localMap, Map<String, Term> globalMap) {
+		System.out.println("Start filtering");
+		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
+				.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<String, Map<String, LinkedTerm>> entry = it.next();
+
+			for (Iterator<Map.Entry<String, LinkedTerm>> it2 = entry.getValue()
+					.entrySet().iterator(); it2.hasNext();) {
+				Entry<String, LinkedTerm> entry2 = it2.next();
+				if(entry2.getValue().getGlobalTerm().counter.getVal() == 1 ||entry2.getValue().getGlobalTerm()==null ){
+					it2.remove();
+					globalMap.remove(entry2.getValue().globalTerm.term);
+				}
+			}
+		}
+		System.out.println("Done filtering");
 	}
 
 	// die kommenden Methoden kann man sicher noch zusammenfassen, ich fand es
@@ -127,8 +144,6 @@ public class MapManager {
 		tmpMap.clear();
 
 	}
-
-
 
 }
 
@@ -185,10 +200,11 @@ class Term {
 		counter = new Counter();
 		term = str;
 	}
+	
 }
 
 class Counter {
-	int val;
+	private int val;
 
 	Counter() {
 		val = 1;

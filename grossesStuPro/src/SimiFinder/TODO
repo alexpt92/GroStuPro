@@ -1,13 +1,11 @@
-MapManager in Parser einbinden
-Algorithmus, der die Terme evaluiert einbinden.
-
-Verschachtelte Datenstruktur der Autoren und Co-Autoren erstellt
-Autoren als neuer Eintrag in Journal und Conference Map oder Neue Maps für Autoren, wie bei Journal und Conference (mit Global und Lokal)
+Haben:
+	-globalMap(alle Terms in einer Map (Term, Counter)
 	
-	Bei Autoren zu beachten: 
-		keine Kommata im author Element
-		Initialien: H. P. Baxter, also immer mit Punkten und Leerzeichen
-		Name wird nur "normal" geschrieben : "Hans Wurst", nicht "Wurst, Hans"
-		Namen sind durch "and" getrennt
-		Reihenfolge ist wichtig
-		
+	-localMap(pro Stream, jeder Term, wobei der Term zum globalen Term gelinkt ist, um sein Gewicht zu bestimmen)
+	
+	-authors(pro Autor alle CoAutoren und Streams mit Anzahl der Beiträge)
+	
+Brauchen:
+	-Evaluierung, die die Listen der Terme vergleicht und Ähnlichkeiten zwischen Streams festellt.(durch LM und GM findet man die relevanten Terme für einen Stream) und in einen Graphen schreibt.
+	
+	-Behandlung der Autoren, wie Terme.
