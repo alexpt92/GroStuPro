@@ -70,9 +70,11 @@ public class SaxParser {
 		ArrayList<String> stops = new ArrayList<String>();
 		private Map<String, Counter> m = new HashMap<String, Counter>();
 		private boolean insideInterestingField = false,
-				insideAuthorField = false, getIt = false;
-		private String Value = "", streamName = "";
+				insideAuthorField = false, getIt = false,
+				insideWwwAuthorField = false, getWww = false;
+		private String Value = "", streamName = "", aliases = "";
 		private MapManager maps = new MapManager(globalMap, localMap, authors);
+		private int aliasCounter = 0;
 
 		public void setDocumentLocator(Locator locator) {
 		}
@@ -88,6 +90,9 @@ public class SaxParser {
 					String[] tmp = str.split("/");
 					streamName = tmp[1];
 				}
+				if (str.startsWith("homepages/")) {
+					getWww = true;
+				}
 			}
 
 			if (rawName.equals("title") && getIt) {
@@ -98,10 +103,25 @@ public class SaxParser {
 				insideAuthorField = true;
 			}
 
+			if (rawName.equals("author") && getWww) {
+				insideWwwAuthorField = true;
+			}
+
 		}
 
 		public void endElement(String namespaceURI, String localName,
 				String rawName) throws SAXException {
+			if (rawName.equals("www") && getWww == true) {
+				if (aliasCounter > 1) {
+					//maps.addAlias(aliases);
+				}
+				getWww = false;
+				aliases = "";
+				aliasCounter = 0;
+			}
+			if ((rawName.equals("article") || rawName.equals("inproceedings") || rawName.equals("proceedings")) && getIt){
+				getIt = false;
+			}
 		}
 
 		@Override
@@ -112,13 +132,12 @@ public class SaxParser {
 		@Override
 		public void endDocument() {
 
-			/*for (String key : authors.keySet()) // AutorMapTest
-			{
-				System.out.print("Key: " + key + " - ");
-				System.out.print("Value: " + authors.get(key) + "\n");
-			}
-			*/
-			
+			/*
+			 * for (String key : authors.keySet()) // AutorMapTest {
+			 * System.out.print("Key: " + key + " - ");
+			 * System.out.print("Value: " + authors.get(key) + "\n"); }
+			 */
+
 			maps.filterMap(localMap, globalMap);
 			System.out.println("Document ends.");
 
@@ -144,6 +163,7 @@ public class SaxParser {
 				}
 				System.out.println("actualStops printed.");
 			}
+
 			System.out.println("Laufzeit" + " "
 					+ (System.currentTimeMillis() - time) / 1000);
 			globalMap.clear();
@@ -168,24 +188,12 @@ public class SaxParser {
 				String Value = new String(ch, start, length);
 				maps.addAuthor(Value, streamName);
 			}
-			/*
-			 * if (!StopWords.isStopWord(s)) {
-			 * 
-			 * if (m.get(s) != null) { m.get(s).inc(); } else {
-			 * 
-			 * Counter counter = new Counter(); m.put(s, counter);
-			 * 
-			 * }
-			 */
 
-			// benutzen, um die Stopwortliste mit den tats�chlichen
-			// Stopw�rtern zu vergleichen
-			/*
-			 * if (checkStopWords && StopWords.isStopWord(s)) { if
-			 * (!stops.contains(s)) { stops.add(s); } }
-			 */
+			if (insideWwwAuthorField) {
+				//aliases += ",_," + new String(ch, start, length);
+				aliasCounter++;
+			}
 
-			getIt = false;
 			insideInterestingField = false;
 			insideAuthorField = false;
 		}
