@@ -1,6 +1,9 @@
 package SimiFinder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class MapManager {
@@ -87,7 +90,7 @@ public class MapManager {
 			
 		}
 	}
-	//schmeißt alle überflüssigen Terme, also die, mit vorkommen 1 aus localMap und globalMap
+	//schmeiï¿½t alle ï¿½berflï¿½ssigen Terme, also die, mit vorkommen 1 aus localMap und globalMap
 	void filterMap(Map<String, Map<String, LinkedTerm>> localMap, Map<String, Term> globalMap) {
 		System.out.println("Start filtering");
 		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
@@ -229,4 +232,52 @@ class Counter {
 	public int getVal() {
 		return val;
 	}
+}
+class vectorspace {
+	
+	void matching(int counter, String k, Map<String, Map<String, LinkedTerm>> localMap){ 
+		//berechnet die Relevanz (wdk) eines Dokumentes fÃ¼r k
+		double N = counter;
+		double nk= vorkommenGesamt(k,localMap);
+		double tf = vorkommenImDokument(k);
+		double Nenner=0;		//Summe von i=1 bis t (tf*log(N/ni))^2
+		double wdk = (tf*Math.log(N/nk))/(Math.sqrt(Nenner));
+}
+	
+	public int vorkommenGesamt(String k, Map<String, Map<String, LinkedTerm>> localMap){ 
+		//gibt die Anzahl der Dokumente wieder, die k enthalten
+		int v= 0;		
+		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
+				.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<String, Map<String, LinkedTerm>> entry = it.next();
+			if (k==entry.getKey())
+			{v=v+1;}
+				}
+		return v;
+
+	}
+	
+	public int vorkommenImDokument(String k){ 
+			//HÃ¤ufigkeit vom Begriff k im Dokument
+		
+		return 0;
+	}
+	
+	public int vocabular(Map<String, Map<String, LinkedTerm>> localMap, Map<String, Term> globalMap){		
+		//gibt die Anzahl der verschiedenen Begriffe aller Dokumente zurÃ¼ck.
+		int v=0;
+		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
+				.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<String, Map<String, LinkedTerm>> entry = it.next();
+			v = v+1;
+			for (Iterator<Map.Entry<String, LinkedTerm>> it2 = entry.getValue()
+					.entrySet().iterator(); it2.hasNext();) {
+				Entry<String, LinkedTerm> entry2 = it2.next();
+				if(entry2.getValue().getGlobalTerm() == entry2.getValue().getGlobalTerm() ){					
+					globalMap.remove(entry2.getValue().globalTerm.term);
+					it2.remove();}
+				}}
+		return v;
+	}
+	
 }
