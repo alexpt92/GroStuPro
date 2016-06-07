@@ -1,37 +1,23 @@
 package SimiFinder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 public class MapManager {
+
+	private Map<String, Term> globalMap;
 	// globalTerms sind alle Terms zusammen in einer Map. Der Key ist dabei der
 	// Term
-	private Map<String, Term> globalMap/* = new HashMap<String, Term>() */;
 
 	// localTerms sind alle Terms pro Stream(Journal oder Conference). Der Key
 	// ist dabei der Journal/ConferenceName. Die zweite Map enthï¿½lt den Term
 	// als
 	// Schlï¿½ssel.
-	private Map<String, Map<String, LinkedTerm>> localMap/*
-														 * = new HashMap<String,
-														 * Map<String,
-														 * LinkedTerm>>()
-														 */;
-
-	private Map<String, Author> authors;
-
-	private Map<String, String[]> aliases = new HashMap<String, String[]>();
-	
-	MapManager(Map<String, Term> inputGlobal,
-			Map<String, Map<String, LinkedTerm>> inputLocal,
-			Map<String, Author> inputAuthor) {
-		this.globalMap = inputGlobal;
-		this.localMap = inputLocal;
-		this.authors = inputAuthor;
-	}
+	private Map<String, Map<String, LinkedTerm>> localMap;
 
 	/*
 	 * Struktur localMap: (Schlï¿½ssel(Journal/ConferenceName)
@@ -40,15 +26,35 @@ public class MapManager {
 	 * ,(Schlï¿½ssel(TermName),(Term(lokaler Term),Term(globaler Term))) ,...)
 	 */
 
+	private Map<String, Author> authorMap;
+
+	private Map<String, String[]> aliasMap;
+	
+	private Map<String, String> coAuthorMap;
+	
+	MapManager(Map<String, Term> inputGlobal,
+			Map<String, Map<String, LinkedTerm>> inputLocal,
+			Map<String, Author> inputAuthor,
+			Map<String, String[]> inputAlias,
+			Map<String, String> inputCoAuthor) {
+		this.globalMap = inputGlobal;
+		this.localMap = inputLocal;
+		this.authorMap = inputAuthor;
+		this.aliasMap = inputAlias;
+		this.coAuthorMap = inputCoAuthor;
+
+	}
+
+
 	void addAuthor(String str, String stream) {
-		if (!authors.containsKey(str)) {
-			authors.put(str, new Author(str));
-			authors.get(str).addStream(stream);
+		if (!authorMap.containsKey(str)) {
+			authorMap.put(str, new Author(str));
+			authorMap.get(str).addStream(stream);
 		} else {
-			if (authors.get(str).streams.containsKey(stream)) {
-				authors.get(str).streams.get(stream).inc();
+			if (authorMap.get(str).streams.containsKey(stream)) {
+				authorMap.get(str).streams.get(stream).inc();
 			} else {
-				authors.get(str).addStream(stream);
+				authorMap.get(str).addStream(stream);
 			}
 		}
 
@@ -82,16 +88,74 @@ public class MapManager {
 	
 	void addAlias(String str){
 		String[] names = str.split(",_,");
-		aliases.put(names[0], names);		
+		aliasMap.put(names[1], names);		
 		
 	}
-	void checkAliases(){
-		for(Iterator<Entry<String,String[]>>it = aliases.entrySet().iterator(); it.hasNext();){
+	String findAlias(String name){
+		//wenn der Name ein Alias ist, wird der Hauptname ausgegeben.
+		for(Map.Entry<String, String[]> entry : aliasMap.entrySet()){
+			if(Arrays.asList(entry.getValue()).contains(name)){
+				return entry.getKey();
+			}
+		}
 			
+		return null;
+	}
+	void checkAliases(){
+		//Aliase werden eleminiert in authorMap, nachdem die Daten im "Hauptartikel" gespeichert werden
+		Map<String, Counter> tmpStreams = new HashMap<String, Counter>();
+		for (Map.Entry<String, String[]> entry : aliasMap.entrySet()){
+			for(int i = 1; i < entry.getValue().length; i++){
+				//iterator fängt bei 2 an, da [0] leer und [1] der "Hauptname des Autors ist"
+				tmpStreams = authorMap.get(entry.getValue()[i]).streams;
+				authorMap.get(entry.getKey()).streams.putAll(tmpStreams);
+				//merged die Liste der Streams
+				
+				for (Author a: authorMap.get(entry.getValue()[i]).coAuthors){
+				//fügt die liste der coauthoren der Hauptliste zu
+					authorMap.get(entry.getKey()).coAuthors.add(a);
+				}				
+				authorMap.remove(entry.getValue()[i]);
+				
+			}
+		}
+								
+	}
+	
+	void fillAuthorLookup(){
+		for (Map.Entry<String, Author> authorEntry : authorMap.entrySet()){
+			for (Map.Entry<String, Counter> streamEntry : authorEntry.getValue().streams.entrySet()){
+				if (streamEntry.getValue().getVal() > 5){
+					
+					
+				}
+			}
 		}
 	}
-	//schmeiï¿½t alle ï¿½berflï¿½ssigen Terme, also die, mit vorkommen 1 aus localMap und globalMap
-	void filterMap(Map<String, Map<String, LinkedTerm>> localMap, Map<String, Term> globalMap) {
+	
+	void createCoauthors(){
+		//nachdem die authorMap bereinigt wurde werden die coauthoren zu authorMap hinzugefugt. Mit Hilfe von checkAliases() werden Aliase direkt ersetzt
+		String tmpAuthor = "", tmpCoAuthor = "";
+		for (Map.Entry<String, String> entry : coAuthorMap.entrySet()){
+			tmpAuthor = entry.getKey();
+			String[] coAuthors = entry.getValue().split(",_,");
+			tmpAuthor = findAlias(entry.getKey());
+			if (tmpAuthor!=null){
+				for (int i = 2; i < coAuthors.length; i++){
+					tmpCoAuthor = findAlias(coAuthors[i]);
+					if (tmpCoAuthor!= null){
+						authorMap.get(tmpAuthor).addCoAuthor(authorMap.get(tmpCoAuthor));
+					}
+				}
+			}
+		}
+	}
+	
+
+	
+
+	void filterMap() {
+		//schmeisst alle uberflussigen Terme, also die, mit vorkommen 1 aus localMap und globalMap
 		System.out.println("Start filtering");
 		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
 				.entrySet().iterator(); it.hasNext();) {
@@ -112,9 +176,10 @@ public class MapManager {
 	// die kommenden Methoden kann man sicher noch zusammenfassen, ich fand es
 	// vorerst einfacher fï¿½r den ï¿½berblick
 
-	// Methode 1: Wenn der Term noch nie vorgekommen ist wird
-	// diese Methode ausgefï¿½hrt
+
 	void createAllNewEntry(String str, String stream) {
+		// Methode 1: Wenn der Term noch nie vorgekommen ist wird
+		// diese Methode ausgefï¿½hrt
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 		Term glblTerm = new Term(str);
 
@@ -122,7 +187,8 @@ public class MapManager {
 		tmpLTerm.setLocalTerm(new Term(str));
 		tmpLTerm.setGlobalTerm(glblTerm);
 		tmpMap.put(str, tmpLTerm);
-
+		
+		
 		globalMap.put(str, glblTerm);
 		localMap.put(stream, tmpMap);
 
@@ -130,9 +196,10 @@ public class MapManager {
 		
 	}
 
-	// Methode 2: Wenn der Term global schon vorgekommen ist, aber der Stream
-	// noch nicht
+
 	void createNewLocalEntry(String str, String stream) {
+		// Methode 2: Wenn der Term global schon vorgekommen ist, aber der Stream
+		// noch nicht
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 
 		LinkedTerm tmpLTerm = new LinkedTerm();
@@ -140,14 +207,16 @@ public class MapManager {
 		tmpLTerm.setGlobalTerm(globalMap.get(str));
 		tmpMap.put(str, tmpLTerm);
 
+		
 		localMap.put(stream, tmpMap);
 
 
 	}
 
-	// Methode 3: Wenn der Term global schon vorgekommen ist und der Stream
-	// bereits existiert, der Term aber noch nicht im Stream eingetragen
+
 	void createNewTermEntry(String str, String stream) {
+		// Methode 3: Wenn der Term global schon vorgekommen ist und der Stream
+		// bereits existiert, der Term aber noch nicht im Stream eingetragen
 		Map<String, LinkedTerm> tmpMap = new HashMap<String, LinkedTerm>();
 
 		LinkedTerm tmpLTerm = new LinkedTerm();
@@ -158,18 +227,31 @@ public class MapManager {
 		localMap.get(stream).put(str, tmpLTerm);
 
 	}
-
+	
+}
+class Node{
+	String name;
+}
+class Edge{
+	Node nodeA, nodeB;
+	Edge(Node a, Node b){
+		this.nodeA = a;
+		this.nodeB = b;
+	}
+}
+class AuthorGraph{
+	ArrayList<Edge> edges = new ArrayList<Edge>();	
 }
 
-// Author enthï¿½lt 2 Listen: -In streams gibt es fï¿½r jedes Journal/Conference
-// einen Eintrag und die Anzahl an Artikeln in diesem Stream, an denen der
-// Author beteiligt war.
-// -coAuthors entï¿½hlt alle Coauthoren des Authors, als rekursiv verschachtelte
-// Struktur.
 class Author {
+	// Author enthï¿½lt 2 Listen: -In streams gibt es fï¿½r jedes Journal/Conference
+	// einen Eintrag und die Anzahl an Artikeln in diesem Stream, an denen der
+	// Author beteiligt war.
+	// -coauthorMap entï¿½hlt alle Coauthoren des authorMap, als rekursiv verschachtelte
+	// Struktur
 	Map<String, Counter> streams = new HashMap<String, Counter>();
 	ArrayList<Author> coAuthors = new ArrayList<Author>();
-	ArrayList<Author> aliases = new ArrayList<Author>();
+
 	String name;
 	
 	Author(String str) {

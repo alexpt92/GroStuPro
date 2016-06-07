@@ -61,20 +61,24 @@ public class SaxParser {
 	}
 
 	class ConfigHandler extends DefaultHandler {
-		// Warum muss initialisiert werden`und nicht einfach ohne instanz:
-		// "new StopWords()"
 		private Map<String, Term> globalMap = new HashMap<String, Term>();
 		private Map<String, Map<String, LinkedTerm>> localMap = new HashMap<String, Map<String, LinkedTerm>>();
 		private Map<String, Author> authors = new HashMap<String, Author>();
+		private Map<String, String[]> aliasMap = new HashMap<String, String[]>();
+		private Map<String, String> coAuthorMap = new HashMap<String, String>();
+
 		StopWords stop = new StopWords();
 		ArrayList<String> stops = new ArrayList<String>();
-		private Map<String, Counter> m = new HashMap<String, Counter>();
+
 		private boolean insideInterestingField = false,
 				insideAuthorField = false, getIt = false,
 				insideWwwAuthorField = false, getWww = false;
-		private String Value = "", streamName = "", aliases = "";
-		private MapManager maps = new MapManager(globalMap, localMap, authors);
-		private int aliasCounter = 0;
+		private String Value = "", streamName = "", aliases = "",
+				mainAuthor = "";
+
+		private MapManager maps = new MapManager(globalMap, localMap, authors,
+				aliasMap, coAuthorMap);
+		private int aliasCounter = 0, authorCount = 0;
 
 		public void setDocumentLocator(Locator locator) {
 		}
@@ -89,6 +93,7 @@ public class SaxParser {
 					getIt = true;
 					String[] tmp = str.split("/");
 					streamName = tmp[1];
+					
 				}
 				if (str.startsWith("homepages/")) {
 					getWww = true;
@@ -113,14 +118,23 @@ public class SaxParser {
 				String rawName) throws SAXException {
 			if (rawName.equals("www") && getWww == true) {
 				if (aliasCounter > 1) {
-					//maps.addAlias(aliases);
+					maps.addAlias(aliases);
+					System.out.println("jup");
 				}
 				getWww = false;
 				aliases = "";
 				aliasCounter = 0;
 			}
-			if ((rawName.equals("article") || rawName.equals("inproceedings") || rawName.equals("proceedings")) && getIt){
+			if ((rawName.equals("article") 
+					|| rawName.equals("inproceedings")
+					|| rawName.equals("proceedings") 
+					|| rawName.equals("book")
+					|| rawName.equals("incollection")
+					|| rawName.equals("phdthesis") 
+					|| rawName.equals("masterthesis")) && getIt) {
 				getIt = false;
+				authorCount = 0;
+				mainAuthor = "";
 			}
 		}
 
@@ -138,15 +152,11 @@ public class SaxParser {
 			 * System.out.print("Value: " + authors.get(key) + "\n"); }
 			 */
 
-			maps.filterMap(localMap, globalMap);
+			// maps.filterMap(localMap, globalMap);
 			System.out.println("Document ends.");
-
-			if (m != null) {
-				// PrintWordList.printCountedList(m);
-			} else {
-				System.out.println("Map is empty");
-
-			}
+			maps.checkAliases();
+			maps.createCoauthors();
+			
 			// Datei mit den gefundenen Stopw�rten aus StopWordsList.txt wird
 			// ausgegeben, wenn checkStopWords = true (kann oben getoggelt
 			// werden)
@@ -169,6 +179,7 @@ public class SaxParser {
 			globalMap.clear();
 			localMap.clear();
 			authors.clear();
+			aliasMap.clear();
 		}
 
 		@Override
@@ -186,11 +197,25 @@ public class SaxParser {
 
 			if (insideAuthorField) {
 				String Value = new String(ch, start, length);
-				maps.addAuthor(Value, streamName);
+
+				
+				if (authorCount < 1) {
+					//Hauptautor wird angezeigt
+					maps.addAuthor(Value, streamName);
+					mainAuthor = Value;
+					coAuthorMap.put(mainAuthor, mainAuthor);
+				} else {
+					String s = coAuthorMap.get(mainAuthor);
+					if (!s.contains(Value)) {
+						s += ",_," + Value;
+						coAuthorMap.put(mainAuthor, s);
+					}
+				}
+				authorCount++;
 			}
 
 			if (insideWwwAuthorField) {
-				//aliases += ",_," + new String(ch, start, length);
+				aliases += ",_," + new String(ch, start, length);
 				aliasCounter++;
 			}
 

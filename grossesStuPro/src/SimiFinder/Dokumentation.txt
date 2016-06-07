@@ -58,16 +58,17 @@ Festzustellen:
 19.05.16
 
 	- Datenstruktur der Autoren und Co-Autoren erstellt
-	- Autoren als neuer Eintrag in Journal und Conference Map
-	
+
 24.05.16
 
-	-Autoren jetzt eigenstädig verwaltet
+	- Autoren jetzt eigenstädig verwaltet
 	
 30.05.16
 
-	-Autoren/Coautorenliste ist korrekt
+	- Autoren/Coautorenliste ist korrekt
 	
-01.05.16
+	
+06.05.16
 
-	-Listen bereinigt und gefiltert
+	- Algorithmus zur Berechnung eines Vektorraummodells zur Evaluierung der Terme implementiert
+	- Autor und CoAutorlisten von Aliasen befreit 
