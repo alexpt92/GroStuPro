@@ -5,19 +5,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AuthorGraph {
-	Map<Node, ArrayList<Edge>> graph = new HashMap<Node, ArrayList<Edge>>();
+	Map<Node, ArrayList<Edge>> graph;
 	GraphLookup lookupGraph;
 
-	AuthorGraph(GraphLookup lookup) {
-		this.lookupGraph = lookup;
+	AuthorGraph() {		
+		this.lookupGraph = new GraphLookup();
+		this.graph = new HashMap<Node, ArrayList<Edge>>();
 	}
-
+	
+	Node getNode(String str){
+		if (lookupGraph.map.containsKey(str)){
+			return lookupGraph.map.get(str);
+		}		
+		return null;		
+	}
+	
 	void addNode(String str) {
+		//kann beim durchlaufen der dblp ausgefuehrt werden
 		Node tmp = new Node(str);
-		graph.put(new Node(str), new ArrayList<Edge>());
+		graph.put(tmp, new ArrayList<Edge>());
 		lookupGraph.map.put(str, tmp);
 	}
 
+	void addEdge(String str, Double d){	
+		//darf nur ausgefuehrt werden, wenn alles geparst ist
+		
+		
+	}
 	Edge[] getEdges(String stream) {
 		int index = 0;
 		if (graph.get(lookupGraph.map.get(stream)) != null) {
@@ -56,5 +70,4 @@ class Edge {
 
 class GraphLookup {
 	Map<String, Node> map = new HashMap<String, Node>();
-
 }
