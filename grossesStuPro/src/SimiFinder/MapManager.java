@@ -106,13 +106,13 @@ public class MapManager {
 		Map<String, Counter> tmpStreams = new HashMap<String, Counter>();
 		for (Map.Entry<String, String[]> entry : aliasMap.entrySet()){
 			for(int i = 1; i < entry.getValue().length; i++){
-				//iterator f�ngt bei 2 an, da [0] leer und [1] der "Hauptname des Autors ist"
+				//iterator f�ngt bei 2 an, da [0] leer und [1] der "Hauptname des Autors ist"
 				tmpStreams = authorMap.get(entry.getValue()[i]).streams;
 				authorMap.get(entry.getKey()).streams.putAll(tmpStreams);
 				//merged die Liste der Streams
 				
 				for (Author a: authorMap.get(entry.getValue()[i]).coAuthors){
-				//f�gt die liste der coauthoren der Hauptliste zu
+				//f�gt die liste der coauthoren der Hauptliste zu
 					authorMap.get(entry.getKey()).coAuthors.add(a);
 				}				
 				authorMap.remove(entry.getValue()[i]);
@@ -315,16 +315,36 @@ class Counter {
 		return val;
 	}
 }
+
 class vectorspace {
+	List<String> Vokabular;
+	Vector DocVector;
 	
-	void matching(int counter, String k, Map<String, Map<String, LinkedTerm>> localMap){ 
-		//berechnet die Relevanz (wdk) eines Dokumentes für k
-		double N = counter;
-		double nk= vorkommenGesamt(k,localMap);
-		double tf = vorkommenImDokument(k);
+	
+	public Vector getVector(int counter, Map<String, Term> globalMap, Map<String, Map<String, LinkedTerm>> localMap, String stream){
+		int N =counter; //Anzahl der Dokumente
+		Vector DocVector= new Vector(); //Dokumentenvektor
+		int t=vocabular(localMap, globalMap); //Anzahl der verschiedenen Begriffe aller Dokumente
+		for (int i=1;i==t;i++){
+			int nk= vorkommenGesamt(Vokabular.get(i),localMap); //Anzahl der Dokumente die den Begriff enthalten
+			int tf=vorkommenImDokument(Vokabular.get(i),stream, localMap); //Häufigkeit des Begriffs im Dokument
+			DocVector.add(matching(t, localMap, N, nk , tf ));
+			
+		}
+		return DocVector;
+	}
+
+	
+	public double matching(int t, Map<String, Map<String, LinkedTerm>> localMap, int counter, int nk, int tf){//berechnet die Relevanz (wdk) eines Dokumentes für k
 		double Nenner=0;		//Summe von i=1 bis t (tf*log(N/ni))^2
-		double wdk = (tf*Math.log(N/nk))/(Math.sqrt(Nenner));
+		
+		for (int i = 1; i==t; i++){	
+			Nenner=Nenner+Math.pow(tf*Math.log(counter/vorkommenGesamt(Vokabular.get(i),localMap)),2);
+		}
+		double wdk = (tf*Math.log(counter/nk))/(Math.sqrt(Nenner));
+		return wdk;
 }
+	
 	
 	public int vorkommenGesamt(String k, Map<String, Map<String, LinkedTerm>> localMap){ 
 		//gibt die Anzahl der Dokumente wieder, die k enthalten
@@ -333,31 +353,46 @@ class vectorspace {
 				.entrySet().iterator(); it.hasNext();) {
 			Map.Entry<String, Map<String, LinkedTerm>> entry = it.next();
 			if (k==entry.getKey())
-			{v=v+1;}
+			{v++;}
 				}
 		return v;
 
 	}
 	
-	public int vorkommenImDokument(String k){ 
+	
+	public int vorkommenImDokument(String k, String stream, Map<String, Map<String, LinkedTerm>> localMap){ 
 			//Häufigkeit vom Begriff k im Dokument
-		
-		return 0;
+		int tf=0;
+		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
+				.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<String, Map<String, LinkedTerm>> entry = it.next();
+			if (entry.getKey()==stream){
+				for (Iterator<Map.Entry<String, LinkedTerm>> tmpIterator = entry.getValue().entrySet().iterator(); tmpIterator.hasNext();){
+				Entry<String, LinkedTerm> entry2 = tmpIterator.next();
+				if (entry.getKey()==k)
+					tf++;
+				}
+			}
+		}
+			
+			return tf;
 	}
 	
 	public int vocabular(Map<String, Map<String, LinkedTerm>> localMap, Map<String, Term> globalMap){		
-		//gibt die Anzahl der verschiedenen Begriffe aller Dokumente zurück.
+		//gibt die Anzahl der verschiedenen Begriffe aller Dokumente zurück & erstellt das ListArray Vokabular.
 		int v=0;
 		for (Iterator<Entry<String, Map<String, LinkedTerm>>> it = localMap
 				.entrySet().iterator(); it.hasNext();) {
 			Map.Entry<String, Map<String, LinkedTerm>> entry = it.next();
-			v = v+1;
+			v++;
+			
 			for (Iterator<Map.Entry<String, LinkedTerm>> it2 = entry.getValue()
 					.entrySet().iterator(); it2.hasNext();) {
 				Entry<String, LinkedTerm> entry2 = it2.next();
-				if(entry2.getValue().getGlobalTerm() == entry2.getValue().getGlobalTerm() ){					
+				if(entry.getValue() == entry2.getValue().getGlobalTerm() ){					
 					globalMap.remove(entry2.getValue().globalTerm.term);
 					it2.remove();}
+				Vokabular.add(entry2.getValue().globalTerm.term);
 				}}
 		return v;
 	}
