@@ -46,7 +46,7 @@ Festzustellen:
 10.05.16
 
 	- Programmlaufzeit verbessert
-	- Liste der Stopwörter erheblich erweitert
+	- Liste der Stopwörter erweitert
 
 15.05.16
 
@@ -68,7 +68,13 @@ Festzustellen:
 	- Autoren/Coautorenliste ist korrekt
 	
 	
-06.05.16
+06.06.16
 
-	- Algorithmus zur Berechnung eines Vektorraummodells zur Evaluierung der Terme implementiert
+	- Algorithmus zur Berechnung eines Vektorraummodells zur Evaluierung der Terme implementiert (Vectorspace)
 	- Autor und CoAutorlisten von Aliasen befreit 
+	
+07.06.16
+
+	- AuthorGraph implementiert
+	- methoden Dokumentiert
+	- Vectorspace erweitert
