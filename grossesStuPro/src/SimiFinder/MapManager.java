@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 public class MapManager {
-
+	int authorCounter = 0, termCounter = 0;
 	private Map<String, Term> globalMap;
 	// globalTerms sind alle Terms zusammen in einer Map. Der Key ist dabei der
 	// Term
@@ -49,18 +49,20 @@ public class MapManager {
 
 	}
 
-	void addAuthor(String str, String stream) {
-		if (!authorMap.containsKey(str)) {
+	void addAuthor(String str, String stream, boolean isCoAuthor, String mainAuthorName) {
+		if(authorMap.containsKey(str)){
+				authorMap.get(str).addStream(stream, isCoAuthor);
+				if(isCoAuthor){
+					authorMap.get(mainAuthorName).coAuthors.add(authorMap.get(str));
+				}
+		}
+		else{
 			authorMap.put(str, new Author(str));
-			authorMap.get(str).addStream(stream);
-		} else {
-			if (authorMap.get(str).streams.containsKey(stream)) {
-				authorMap.get(str).streams.get(stream).inc();
-			} else {
-				authorMap.get(str).addStream(stream);
+			authorMap.get(str).addStream(stream, isCoAuthor);
+			if(isCoAuthor){
+				authorMap.get(mainAuthorName).coAuthors.add(authorMap.get(str));
 			}
 		}
-
 	}
 
 	void addTerm(String str, String stream) {
@@ -100,7 +102,7 @@ public class MapManager {
 		tmpLTerm.setGlobalTerm(glblTerm);
 		tmpMap.put(str, tmpLTerm);
 		
-		authorGraph.addNode(stream);
+
 			
 		globalMap.put(str, glblTerm);
 		localMap.put(stream, tmpMap);
@@ -117,8 +119,7 @@ public class MapManager {
 		tmpLTerm.setLocalTerm(new Term(str));
 		tmpLTerm.setGlobalTerm(globalMap.get(str));
 		tmpMap.put(str, tmpLTerm);
-		
-		authorGraph.addNode(stream);
+
 		
 		localMap.put(stream, tmpMap);
 
@@ -141,7 +142,6 @@ public class MapManager {
 	void addAlias(String str) {
 		String[] names = str.split(",_,");
 		aliasMap.put(names[1], names);
-
 	}
 
 	String findAlias(String name) {
@@ -155,61 +155,13 @@ public class MapManager {
 		return null;
 	}
 
-	void checkAliases() {
-		// Aliase werden eleminiert in authorMap, nachdem die Daten im
-		// "Hauptartikel" gespeichert werden
-		Map<String, Counter> tmpStreams = new HashMap<String, Counter>();
-		for (Map.Entry<String, String[]> entry : aliasMap.entrySet()) {
-			if (entry.getValue() != null) {
-				for (int i = 1; i < entry.getValue().length; i++) {
-					// iterator f�ngt bei 2 an, da [0] leer und [1] der
-					// "Hauptname des Autors ist"
-					tmpStreams = authorMap.get(entry.getValue()[i]).streams;
-					authorMap.get(entry.getKey()).streams.putAll(tmpStreams);
-					// merged die Liste der Streams
+	
 
-					for (Author a : authorMap.get(entry.getValue()[i]).coAuthors) {
-						// f�gt die liste der coauthoren der Hauptliste zu
-						authorMap.get(entry.getKey()).coAuthors.add(a);
-					}
-					authorMap.remove(entry.getValue()[i]);
-
-				}
-			}
-		}
-	}
-
-	void fillAuthorLookup() {
-		// fuellt den AuthorGraph
-		for (Map.Entry<String, Author> authorEntry : authorMap.entrySet()) {
-			for (Map.Entry<String, Counter> streamEntry : authorEntry
-					.getValue().streams.entrySet()) {
-				if (streamEntry.getValue().getVal() > 5) {
-
-				}
-			}
-		}
-	}
 
 	void createCoauthors() {
 		// nachdem die authorMap bereinigt wurde werden die coauthoren zu
 		// authorMap hinzugefugt. Mit Hilfe von checkAliases() werden Aliase
 		// direkt ersetzt
-		String tmpAuthor = "", tmpCoAuthor = "";
-		for (Map.Entry<String, String> entry : coAuthorMap.entrySet()) {
-			tmpAuthor = entry.getKey();
-			String[] coAuthors = entry.getValue().split(",_,");
-			tmpAuthor = findAlias(entry.getKey());
-			if (tmpAuthor != null) {
-				for (int i = 2; i < coAuthors.length; i++) {
-					tmpCoAuthor = findAlias(coAuthors[i]);
-					if (tmpCoAuthor != null) {
-						authorMap.get(tmpAuthor).addCoAuthor(
-								authorMap.get(tmpCoAuthor));
-					}
-				}
-			}
-		}
 	}
 
 	void filterMap() {
@@ -245,26 +197,49 @@ class Author {
 	// Journal/Conference
 	// einen Eintrag und die Anzahl an Artikeln in diesem Stream, an denen der
 	// Author beteiligt war.
-	// -coauthorMap ent�hlt alle Coauthoren des authorMap, als rekursiv
+	// -coauthorMap ent�hlt alle Coauthoren des authors, als rekursiv
 	// verschachtelte
 	// Struktur
-	Map<String, Counter> streams = new HashMap<String, Counter>();
-	ArrayList<Author> coAuthors = new ArrayList<Author>();
-
+	ArrayList<StreamWithCounter> streamsAsAuthor;
+	ArrayList<StreamWithCounter> streamsAsCoAuthor;
+	ArrayList<Author> coAuthors;
 	String name;
-
 	Author(String str) {
+		this.streamsAsAuthor = new ArrayList<StreamWithCounter>();
+		this.streamsAsCoAuthor = new ArrayList<StreamWithCounter>();
+		this.coAuthors = new ArrayList<Author>();
 		this.name = str;
 	}
 
-	void addCoAuthor(Author a) {
-		this.coAuthors.add(a);
+	void addStream(String str, boolean isCoAuthor) {
+		boolean found = false;
+		if(isCoAuthor){
+			for(StreamWithCounter s:streamsAsCoAuthor){
+				if(s.streamName.equals(str)){
+					s.counter.inc();
+					found = true;
+					break;
+				}
+			}
+			if(!found){
+				streamsAsCoAuthor.add(new StreamWithCounter(str));
+			}
+		}
+		else{
+			for(StreamWithCounter s:streamsAsAuthor){
+				if(s.streamName.equals(str)){
+					s.counter.inc();
+					found = true;
+					break;
+				}
+			}
+			if(!found){
+				streamsAsAuthor.add(new StreamWithCounter(str));
+			}
+		}
+
 	}
 
-	void addStream(String str) {
-		Counter counter = new Counter();
-		this.streams.put(str, counter);
-	}
 }
 
 class LinkedTerm {
@@ -288,6 +263,14 @@ class LinkedTerm {
 	}
 }
 
+class StreamWithCounter{
+	Counter counter;
+	String streamName;
+	StreamWithCounter(String s){
+		this.counter = new Counter();
+		this.streamName = s;
+	}
+}
 class Term {
 	String term;
 	Counter counter;

@@ -78,7 +78,7 @@ public class SaxParser {
 
 		private MapManager maps = new MapManager(globalMap, localMap, authors,
 				aliasMap, coAuthorMap);
-		private int aliasCounter = 0, authorCount = 0;
+		private int authorCount = 0;
 
 		public void setDocumentLocator(Locator locator) {
 		}
@@ -116,15 +116,12 @@ public class SaxParser {
 
 		public void endElement(String namespaceURI, String localName,
 				String rawName) throws SAXException {
-			if (rawName.equals("www") && getWww == true) {
-				if (aliasCounter > 1) {
-					maps.addAlias(aliases);
-					System.out.println("jup");
-				}
-				getWww = false;
-				aliases = "";
-				aliasCounter = 0;
+			if (rawName.equals("www") && getWww == true){}
+			
+			if (rawName.equals("author") && insideAuthorField){
+				authorCount++;
 			}
+			
 			if ((rawName.equals("article") 
 					|| rawName.equals("inproceedings")
 					|| rawName.equals("proceedings") 
@@ -154,28 +151,14 @@ public class SaxParser {
 
 			// maps.filterMap(localMap, globalMap);
 			System.out.println("Document ends.");
-			maps.checkAliases();
-			maps.createCoauthors();
-			
-			// Datei mit den gefundenen Stopw�rten aus StopWordsList.txt wird
-			// ausgegeben, wenn checkStopWords = true (kann oben getoggelt
-			// werden)
-			if (checkStopWords) {
-				try {
-					PrintStream ps = new PrintStream(
-							new File("actualStops.txt"));
-					for (String s : stops) {
-						ps.println(s);
-					}
-					ps.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				System.out.println("actualStops printed.");
-			}
-
 			System.out.println("Laufzeit" + " "
 					+ (System.currentTimeMillis() - time) / 1000);
+			
+			System.out.println(authors.get("Zbigniew Huzar").name);
+			for(StreamWithCounter s: authors.get("Zbigniew Huzar").streamsAsAuthor){
+				System.out.println(s.streamName);
+				System.out.println(s.counter.getVal());
+			}
 			globalMap.clear();
 			localMap.clear();
 			authors.clear();
@@ -197,26 +180,17 @@ public class SaxParser {
 
 			if (insideAuthorField) {
 				String Value = new String(ch, start, length);
-
-				
-				if (authorCount < 1) {
-					//Hauptautor wird angezeigt
-					maps.addAuthor(Value, streamName);
+				if (authorCount == 0){
+					maps.addAuthor(Value, streamName, false, "");
 					mainAuthor = Value;
-					coAuthorMap.put(mainAuthor, mainAuthor);
-				} else {
-					String s = coAuthorMap.get(mainAuthor);
-					if (!s.contains(Value)) {
-						s += ",_," + Value;
-						coAuthorMap.put(mainAuthor, s);
-					}
 				}
-				authorCount++;
+				else if (authorCount > 0){
+					maps.addAuthor(Value, streamName, true, mainAuthor);
+				}
 			}
 
 			if (insideWwwAuthorField) {
-				aliases += ",_," + new String(ch, start, length);
-				aliasCounter++;
+
 			}
 
 			insideInterestingField = false;
