@@ -1,10 +1,7 @@
 package SimiFinder;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
@@ -19,14 +16,50 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class SaxParser {
-
+	private String fileLocation, stopWordsLocation, method;
 	private long time;
-	private boolean checkStopWords = false;
+	private boolean filterStopWords, noValidation;
 
-	public SaxParser(String dblpXmlFileName) {
+	public SaxParser(String[] args) {
+
 		try {
+			System.out.println("Type 'help' for run info");
+			if (args[0].equals("help")) {
+				System.out
+						.println("options: ./simiFinder.jar [dblpFileLocaiton] [OutputFile] [runoptions]"
+								+ "\n\n"
+								+ "Runoptions:"
+								+ "\n"
+								+ "'-sw=[StopWordsFileLocation]': enable filtering of StopWords taken from StopWordsFile"
+								+ "\n"
+								+ "'-asCA': (asCoAuthor) consider appearances of each author as a coauthor"
+								+ "\n"
+								+ "'-noValiation': no DTD is needed, since the xml is considered valid(increases runtime)"
+								+ "\n");
+				System.exit(0);
+			}
+			method = "";
+			String dblpXmlFileName = args[0];
+			fileLocation = args[1];
+			for (String s : args){
+
+				if (s.startsWith("-sw")){
+					filterStopWords = true; 
+					stopWordsLocation = s.split("-sw=")[1];
+				}
+				else if (s.startsWith("-asCA")){
+					method += "asCA";
+					
+				}
+				else if(s.startsWith("-noValidation")){
+					noValidation = true;
+				}
+			}
+			
+
 			time = System.currentTimeMillis();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
+			if (noValidation){factory.setValidating(true);}
 			SAXParser saxParser = factory.newSAXParser();
 
 			ConfigHandler handler = new ConfigHandler();
@@ -47,17 +80,17 @@ public class SaxParser {
 
 	public static void main(String[] args) {
 		System.setProperty("entityExpansionLimit", "2500000");
-		/*
-		 * if (args.length < 1) { System.out
-		 * .println("Usage: java BooleanRetrieval1 [dblpXmlFileName]");
-		 * System.exit(0); }
-		 */
-		/*
-		 * System.out.println("Dateipfad der dblp eingeben: "); Scanner input =
-		 * new Scanner(System.in); String s = input.next(); input.close();
-		 */
-		String s = "C:\\Users\\Admin\\Desktop\\Uni\\GrStuPro\\dblp.xml";
-		new SaxParser(s);
+		if (args.length < 1) {
+			System.out.println("Type 'help' for run info");
+			System.exit(0);
+		}
+
+		// System.out.println("Dateipfad der dblp eingeben: "); Scanner input =
+		// new Scanner(System.in); String s = input.next(); input.close();
+
+		// String s =
+		// "C:\\Users\\Admin\\Desktop\\Uni\\GrStuPro\\dblp\\dblp.xml";
+		new SaxParser(args);
 	}
 
 	class ConfigHandler extends DefaultHandler {
@@ -66,18 +99,20 @@ public class SaxParser {
 		private Map<String, Author> authors = new HashMap<String, Author>();
 		private Map<String, String[]> aliasMap = new HashMap<String, String[]>();
 		private Map<String, String> coAuthorMap = new HashMap<String, String>();
+		private Map<String, Stream> streamMap = new HashMap<String, Stream>();
 
-		StopWords stop = new StopWords();
+		StopWords stop;
+		
 		ArrayList<String> stops = new ArrayList<String>();
 
 		private boolean insideInterestingField = false,
 				insideAuthorField = false, getIt = false,
-				insideWwwAuthorField = false, getWww = false;
-		private String Value = "", streamName = "", aliases = "",
-				mainAuthor = "";
+				insideWwwAuthorField = false, getWww = false, journal = false;
+		private String Value = "", streamName = "", mainAuthor = "",
+				oldStreamName = "";
 
 		private MapManager maps = new MapManager(globalMap, localMap, authors,
-				aliasMap, coAuthorMap);
+				aliasMap, coAuthorMap, streamMap, stop);
 		private int authorCount = 0;
 
 		public void setDocumentLocator(Locator locator) {
@@ -93,7 +128,16 @@ public class SaxParser {
 					getIt = true;
 					String[] tmp = str.split("/");
 					streamName = tmp[1];
-					
+					if (!oldStreamName.equals(streamName)) {
+						if (str.startsWith("journals/")) {
+							journal = true;
+						} else if (str.startsWith("conf/")) {
+							journal = false;
+						}
+						streamMap.put(streamName, new Stream(streamName,
+								journal));
+						oldStreamName = streamName;
+					}
 				}
 				if (str.startsWith("homepages/")) {
 					getWww = true;
@@ -116,19 +160,18 @@ public class SaxParser {
 
 		public void endElement(String namespaceURI, String localName,
 				String rawName) throws SAXException {
-			if (rawName.equals("www") && getWww == true){}
-			
-			if (rawName.equals("author") && insideAuthorField){
+			if (rawName.equals("www") && getWww == true) {
+			}
+
+			if (rawName.equals("author")) {
 				authorCount++;
 			}
-			
-			if ((rawName.equals("article") 
-					|| rawName.equals("inproceedings")
-					|| rawName.equals("proceedings") 
-					|| rawName.equals("book")
+
+			if ((rawName.equals("article") || rawName.equals("inproceedings")
+					|| rawName.equals("proceedings") || rawName.equals("book")
 					|| rawName.equals("incollection")
-					|| rawName.equals("phdthesis") 
-					|| rawName.equals("masterthesis")) && getIt) {
+					|| rawName.equals("phdthesis") || rawName
+						.equals("masterthesis")) && getIt) {
 				getIt = false;
 				authorCount = 0;
 				mainAuthor = "";
@@ -138,6 +181,9 @@ public class SaxParser {
 		@Override
 		public void startDocument() {
 			System.out.println("Document starts.");
+			if (filterStopWords){
+				stop = new StopWords(stopWordsLocation);
+			}
 		}
 
 		@Override
@@ -151,18 +197,10 @@ public class SaxParser {
 
 			// maps.filterMap(localMap, globalMap);
 			System.out.println("Document ends.");
+			maps.authorSimilarity(fileLocation, method);
 			System.out.println("Laufzeit" + " "
-					+ (System.currentTimeMillis() - time) / 1000);
-			
-			System.out.println(authors.get("Zbigniew Huzar").name);
-			for(StreamWithCounter s: authors.get("Zbigniew Huzar").streamsAsAuthor){
-				System.out.println(s.streamName);
-				System.out.println(s.counter.getVal());
-			}
-			globalMap.clear();
-			localMap.clear();
-			authors.clear();
-			aliasMap.clear();
+					+ (System.currentTimeMillis() - time) / 1000 +"s");
+
 		}
 
 		@Override
@@ -174,17 +212,17 @@ public class SaxParser {
 				for (String s : tokens) {
 					s = s.replaceAll("[^a-zA-Z]", "");
 					s = s.toLowerCase();
-					maps.addTerm(s, streamName);
+					maps.addTerm(s, streamName, filterStopWords);
 				}
 			}
 
 			if (insideAuthorField) {
 				String Value = new String(ch, start, length);
-				if (authorCount == 0){
+
+				if (authorCount == 0) {
 					maps.addAuthor(Value, streamName, false, "");
 					mainAuthor = Value;
-				}
-				else if (authorCount > 0){
+				} else if (authorCount > 0 && !mainAuthor.equals("")) {
 					maps.addAuthor(Value, streamName, true, mainAuthor);
 				}
 			}

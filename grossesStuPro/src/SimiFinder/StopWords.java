@@ -4,12 +4,13 @@ import java.io.*;
 import java.util.*;
 
 public class StopWords {
-	static ArrayList<String> words = new ArrayList<String>();
-	public StopWords(){
+	private ArrayList<String> words;
+	public StopWords(String fileLoc){
+		words = new ArrayList<String>();
 		try{
 			
 			String line;
-			BufferedReader br = new BufferedReader(new FileReader("StopWordsList.txt"));
+			BufferedReader br = new BufferedReader(new FileReader(fileLoc));
 			
 			while ((line = br.readLine()) != null){
 				if (!line.equals(" "))words.add(line);
@@ -20,8 +21,8 @@ public class StopWords {
 		}
 	}
 	
-	public static boolean isStopWord(String str){
-		if (words.contains(str)){
+	public boolean isStopWord(String str){
+		if (this.words.contains(str)){
 			return true;
 		}
 		else{
